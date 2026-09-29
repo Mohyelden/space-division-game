@@ -24,7 +24,7 @@ export default function MapPage() {
   const navigate = useNavigate()
 
   const level0Complete =
-    localStorage.getItem('level0Complete') === 'true'
+    localStorage.getItem('IsTutorialCompleted') === 'true'
 
   const level1Complete =
     localStorage.getItem('level1Complete') === 'true'

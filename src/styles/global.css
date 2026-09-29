@@ -11631,3 +11631,60 @@ p {
   .prep1-progress { margin-top: 5px; }
   .prep1-footer { height: 48px; }
 }
+
+/* Single MP4 tutorial before the first preparatory stage. */
+.level0-video-page { min-height: 100svh; padding: clamp(10px, 2vw, 22px); }
+.level0-video-cockpit { width: min(1100px, 100%); min-height: 0; padding: clamp(14px, 3vw, 28px); }
+.level0-video-heading { text-align: center; margin: 12px auto 19px; }
+.level0-video-heading span { color: #ffe579; font-weight: 900; font-size: .8rem; }
+.level0-video-heading h1 { margin: 6px 0; font-size: clamp(1.4rem, 3vw, 2.3rem); line-height: 1.35; }
+.level0-video-heading p { margin: 0; color: #93dcf6; font-size: clamp(.75rem, 1.5vw, .95rem); }
+.level0-video-frame { position: relative; width: min(100%, 980px); aspect-ratio: 16 / 9; margin-inline: auto; overflow: hidden; border: 2px solid #67c8ff75; border-radius: 23px; background: #07132d; box-shadow: 0 20px 60px #0007, 0 0 34px #42b9ff27; }
+.level0-video-frame video { width: 100%; height: 100%; display: block; object-fit: contain; }
+.level0-video-start, .level0-video-error { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 13px; padding: 18px; text-align: center; background: radial-gradient(circle at center, #173d78e8, #061329f4 72%); }
+.level0-video-play-icon { width: 72px; height: 72px; display: grid; place-items: center; padding-inline-start: 5px; border-radius: 50%; border: 2px solid #b5f3ff; color: #06345a; background: linear-gradient(135deg, #abf5ff, #63bbff); box-shadow: 0 0 30px #6cdaff91; font-size: 1.6rem; }
+.level0-video-start strong { font-size: clamp(1rem, 2.4vw, 1.55rem); }
+.level0-video-start button, .level0-video-error button { min-height: 46px; padding: 10px 24px; border: 1px solid #bdffb5; border-radius: 13px; color: #0a3c1b; background: linear-gradient(#a1ff89, #4beb67); font: inherit; font-weight: 900; cursor: pointer; }
+.level0-video-start small { color: #b8d4ef; }
+.level0-video-actions { min-height: 65px; display: flex; align-items: center; justify-content: space-between; gap: 14px; color: #a9c3de; font-size: .8rem; }
+.level0-video-actions button { min-height: 44px; padding: 8px 16px; border: 1px solid #8dcaff73; border-radius: 12px; background: #173459; color: #edfaff; font: inherit; font-weight: 800; cursor: pointer; }
+.level0-video-actions button:hover { background: #27578e; }
+@media (max-width: 650px) { .level0-video-cockpit { border-radius: 22px; } .level0-video-frame { border-radius: 15px; } .level0-video-actions { flex-direction: column; text-align: center; padding-top: 12px; } .level0-video-actions button { width: 100%; } .level0-video-play-icon { width: 52px; height: 52px; font-size: 1.2rem; } .level0-video-start { gap: 7px; } .level0-video-start button { min-height: 38px; padding: 7px 11px; font-size: .8rem; } .level0-video-start small { display: none; } }
+
+/* Preparatory stage 2: partial quotients and draggable keypad. */
+.level0-stage2-cockpit { width: min(1100px, 100%); min-height: 0; }
+.level0-stage2-window { min-height: 0; height: auto; overflow: visible; }
+.level0-stage2-layout { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) 215px; gap: 18px; width: min(900px, 100%); margin: 20px auto 0; direction: ltr; }
+.level0-stage2-model, .level0-stage2-keypad { min-width: 0; border: 1px solid #65baff60; border-radius: 20px; background: #0c2348d9; padding: 18px; }
+.level0-stage2-equation { color: #a1edff; font-size: 1.8rem; font-weight: 900; text-align: center; margin-bottom: 14px; }
+.level0-stage2-rectangle { display: grid; grid-template-columns: 2fr 1fr; border: 3px solid #80dcff; border-radius: 16px; overflow: hidden; min-height: 200px; }
+.level0-stage2-part { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 11px; min-width: 0; padding: 14px 7px; background: #24537e; }
+.level0-stage2-part + .level0-stage2-part { border-left: 2px solid #9bdcff80; background: #414878; }
+.level0-stage2-part > strong { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+.level0-stage2-part > span { color: #c8edff; font-size: .83rem; font-weight: 800; }
+.level0-stage2-slots { display: flex; justify-content: center; gap: 5px; }
+.stage2-digit-slot { width: clamp(34px, 4vw, 46px); height: 48px; border: 2px dashed #9bdcff; border-radius: 9px; color: #fff; background: #091b39; font-size: 1.25rem; font-weight: 900; cursor: pointer; }
+.stage2-digit-slot.selected, .stage2-digit-slot.over { border-color: #8bffad; background: #246747; box-shadow: 0 0 16px #4cff7560; }
+.level0-stage2-sum { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 13px; color: #b3e7fa; font-size: 1.2rem; font-weight: 900; }
+.level0-stage2-sum strong { color: #8effa7; }
+.level0-stage2-keypad { direction: rtl; text-align: center; }
+.level0-stage2-keypad > strong { color: #8be9ff; }
+.level0-stage2-keypad p { margin: 3px 0 12px; color: #a9bedc; font-size: .72rem; }
+.level0-stage2-keypad-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.stage2-digit { min-width: 0; height: 46px; border: 1px solid #8aceff; border-radius: 9px; color: white; background: linear-gradient(#4da3df, #2465a5); font-size: 1.4rem; font-weight: 900; touch-action: none; cursor: grab; }
+.stage2-digit.dragging { opacity: .35; }
+.stage2-digit.drag-overlay { width: 50px; display: grid; place-items: center; box-shadow: 0 14px 25px #0008; }
+.level0-stage2-clear { width: 100%; min-height: 36px; margin-top: 12px; border: 1px solid #c1b6ff6b; border-radius: 9px; color: #e0d8ff; background: #3a3570; font: inherit; font-size: .75rem; font-weight: 800; cursor: pointer; }
+.level0-stage2-action { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 12px auto; color: #a5c8e5; font-size: .78rem; }
+.level0-stage2-action .stage2-check-btn { min-height: 44px; }
+.level0-stage2-window .stage2-feedback { width: min(900px, 100%); margin: 11px auto; }
+.level0-stage2-window .stage2-engine-section { width: min(680px, 100%); margin-inline: auto; }
+@media (max-width: 700px) { .level0-stage2-layout { grid-template-columns: minmax(0, 1fr); } .level0-stage2-keypad-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } .level0-stage2-keypad { padding: 12px; } .stage2-digit { height: 42px; } .level0-stage2-model { padding: 10px; } .level0-stage2-rectangle { min-height: 170px; } .level0-stage2-part { gap: 6px; } .stage2-digit-slot { width: 34px; height: 40px; } }
+@media (max-width: 380px) { .level0-stage2-layout { gap: 10px; } .level0-stage2-keypad-grid { gap: 5px; } .stage2-digit-slot { width: 30px; height: 38px; } .level0-stage2-part > span { font-size: .68rem; } }
+
+.level0-earned-title { width: fit-content; max-width: 100%; margin: 0 auto 15px; padding: 8px 18px; border: 1px solid #ffe78383; border-radius: 99px; background: #c9962e25; color: #ffe185; font-size: .9rem; }
+.level0-earned-title strong { color: #fff2af; }
+.hint-focus .prep1-number-box:not(.prep1-number-color-hint),
+.hint-focus .prep1-label-card:not(.prep1-label-color-hint) { filter: grayscale(1); opacity: .48; }
+.result-stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); width: min(760px, 100%); }
+@media (max-width: 700px) { .result-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

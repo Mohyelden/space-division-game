@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   DndContext,
@@ -319,6 +319,12 @@ function NumberBox({
 export default function Stage1Page() {
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (!localStorage.getItem('level0StartTime')) {
+      localStorage.setItem('level0StartTime', String(Date.now()))
+    }
+  }, [])
+
   const [activeCard, setActiveCard] =
     useState<ConceptCard | null>(
       null
@@ -345,6 +351,12 @@ export default function Stage1Page() {
 
   const [completed, setCompleted] =
     useState(false)
+
+  useEffect(() => {
+    if (!completed) return
+    const timer = window.setTimeout(() => navigate('/level/0/stage/2'), 1800)
+    return () => window.clearTimeout(timer)
+  }, [completed, navigate])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -411,6 +423,8 @@ export default function Stage1Page() {
       wrongCounts[id] >= 3
     )
   }
+
+  const colorHintActive = cards.some((card) => shouldShowColorMatch(card.id))
 
   const handleDragStart = (
     event: DragStartEvent
@@ -788,7 +802,7 @@ export default function Stage1Page() {
                   نموذج مساحة المستطيل
                 </div>
 
-                <div className="prep1-model-canvas">
+                <div className={`prep1-model-canvas${colorHintActive ? ' hint-focus' : ''}`}>
 
                   {/* MAIN RECTANGLE */}
 
@@ -799,7 +813,7 @@ export default function Stage1Page() {
                     <div className="prep1-position prep1-position-dividend">
 
                       <NumberBox
-                        value="1395"
+                        value="375"
                         colorHint={
                           shouldShowColorMatch(
                             'dividend'
@@ -873,7 +887,7 @@ export default function Stage1Page() {
                   <div className="prep1-position prep1-position-quotient">
 
                     <NumberBox
-                      value="279"
+                        value="75"
                       colorHint={
                         shouldShowColorMatch(
                           'quotient'
@@ -906,7 +920,7 @@ export default function Stage1Page() {
                 اسحب البطاقات
               </span>
 
-              <div className="prep1-card-row">
+              <div className={`prep1-card-row${colorHintActive ? ' hint-focus' : ''}`}>
 
                 {cards
                   .filter(

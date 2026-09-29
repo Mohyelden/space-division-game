@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
@@ -58,6 +58,23 @@ export default function ResultPage() {
       : totalScore >= 70
       ? 2
       : 1
+
+  const title = totalScore >= 85 ? 'مهندس المحركات' : 'مستكشف الفضاء المبتدئ'
+  const startTime = Number(localStorage.getItem('level0StartTime'))
+  const endTime = Number(localStorage.getItem('level0EndTime'))
+  const elapsedSeconds = startTime > 0 && endTime >= startTime
+    ? Math.floor((endTime - startTime) / 1000)
+    : 0
+  const elapsedTime = `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, '0')}`
+
+  useEffect(() => {
+    if (!stage1.completed || !stage2.completed) {
+      navigate('/level/0/stage/1', { replace: true })
+      return
+    }
+    localStorage.setItem('IsTutorialCompleted', 'true')
+    localStorage.setItem('level0Complete', 'true')
+  }, [navigate, stage1.completed, stage2.completed])
 
   return (
     <main
@@ -162,7 +179,15 @@ export default function ResultPage() {
             ))}
           </div>
 
+          <div className="level0-earned-title">لقبك الجديد: <strong>{title}</strong></div>
+
           <div className="result-stats-grid">
+
+            <div className="result-stat-card">
+              <span>وقت الرحلة</span>
+              <strong dir="ltr">{elapsedTime}</strong>
+              <small>دقيقة : ثانية</small>
+            </div>
 
             <div className="result-stat-card">
               <span>
@@ -279,6 +304,10 @@ export default function ResultPage() {
               localStorage.removeItem(
                 'level0Complete'
               )
+
+              localStorage.removeItem('IsTutorialCompleted')
+              localStorage.removeItem('level0StartTime')
+              localStorage.removeItem('level0EndTime')
 
               navigate('/tutorial')
             }}
