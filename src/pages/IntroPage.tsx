@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
-import introVideo from '../assets/سفينة_القسمة_مقدمة.mp4'
+import introVideo from '../assets/سفينة_القسمة_مقدمة_محسنة.mp4'
 
 export default function IntroPage() {
   const navigate = useNavigate()
