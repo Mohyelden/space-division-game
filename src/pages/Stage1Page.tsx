@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import {
   DndContext,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
   PointerSensor,
   TouchSensor,
   useDraggable,
@@ -9,7 +11,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
 type CardType = {
@@ -42,45 +44,28 @@ function DraggableCard({
     attributes,
     listeners,
     setNodeRef,
-    transform,
     isDragging,
   } = useDraggable({
     id: card.id,
     disabled,
   })
 
-  const style = {
-    transform: transform
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : undefined,
-    opacity: isDragging ? 0.55 : 1,
-    cursor: disabled ? 'default' : 'grab',
-  }
-
   return (
-    <motion.button
+    <button
       ref={setNodeRef}
-      style={style}
       {...listeners}
       {...attributes}
-      className={`stage1-number-card ${card.type}`}
-      whileHover={
-        disabled
-          ? {}
-          : {
-              scale: 1.06,
-            }
-      }
-      whileTap={
-        disabled
-          ? {}
-          : {
-              scale: 0.96,
-            }
-      }
+      className={[
+        'stage1-number-card',
+        card.type,
+        isDragging ? 'dragging-source' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      disabled={disabled}
     >
       {card.value}
-    </motion.button>
+    </button>
   )
 }
 
@@ -120,7 +105,7 @@ function DropZone({
           ? {
               boxShadow: [
                 '0 0 10px rgba(255,220,70,.25)',
-                '0 0 26px rgba(255,220,70,.7)',
+                '0 0 28px rgba(255,220,70,.8)',
                 '0 0 10px rgba(255,220,70,.25)',
               ],
             }
@@ -180,25 +165,30 @@ export default function Stage1Page() {
   const [completed, setCompleted] =
     useState(false)
 
+  const [activeCard, setActiveCard] =
+    useState<CardType | null>(null)
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5,
+        distance: 4,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 150,
+        delay: 100,
         tolerance: 5,
       },
     })
   )
 
   const score = useMemo(() => {
-    const penalty =
-      attempts * 5 + hintsUsed * 10
-
-    return Math.max(0, 100 - penalty)
+    return Math.max(
+      0,
+      100 -
+        attempts * 5 -
+        hintsUsed * 10
+    )
   }, [attempts, hintsUsed])
 
   const usedCardIds = useMemo(() => {
@@ -228,36 +218,45 @@ export default function Stage1Page() {
       setFeedback(
         'ممتاز! وضعت المقسوم والمقسوم عليه في المكان الصحيح.'
       )
-
-      const result = {
-        attempts,
-        hintsUsed,
-        score,
-        completed: true,
-      }
-
-      localStorage.setItem(
-        'level0Stage1',
-        JSON.stringify(result)
-      )
     }
+  }
+
+  const handleDragStart = (
+    event: DragStartEvent
+  ) => {
+    const card = cards.find(
+      (item) =>
+        item.id === event.active.id
+    )
+
+    if (card) {
+      setActiveCard(card)
+    }
+  }
+
+  const handleDragCancel = () => {
+    setActiveCard(null)
   }
 
   const handleDragEnd = (
     event: DragEndEvent
   ) => {
-    const {
-      active,
-      over,
-    } = event
+    const { active, over } = event
 
-    if (!over || completed) return
+    setActiveCard(null)
+
+    if (!over || completed) {
+      return
+    }
 
     const card = cards.find(
-      (item) => item.id === active.id
+      (item) =>
+        item.id === active.id
     )
 
-    if (!card) return
+    if (!card) {
+      return
+    }
 
     const target = over.id
 
@@ -277,10 +276,7 @@ export default function Stage1Page() {
         'ليست هنا. حاول مرة أخرى 👀'
       )
 
-      if (
-        nextAttempts >= 2 &&
-        !showHint
-      ) {
+      if (nextAttempts >= 2) {
         setShowHint(true)
       }
 
@@ -317,13 +313,13 @@ export default function Stage1Page() {
   }
 
   const useHint = () => {
-    if (showHint) {
-      setHintsUsed((prev) => prev + 1)
+    setHintsUsed(
+      (prev) => prev + 1
+    )
 
-      setFeedback(
-        'التلميح: 36 هو المقسوم، و9 هو المقسوم عليه.'
-      )
-    }
+    setFeedback(
+      'التلميح: 36 هو المقسوم، و9 هو المقسوم عليه.'
+    )
   }
 
   const resetStage = () => {
@@ -331,18 +327,22 @@ export default function Stage1Page() {
     setDivisor(null)
     setAttempts(0)
     setHintsUsed(0)
+    setShowHint(false)
+    setCompleted(false)
+    setActiveCard(null)
+
     setFeedback(
       'اسحب كل بطاقة إلى مكانها الصحيح حول نموذج مساحة المستطيل.'
     )
-    setShowHint(false)
-    setCompleted(false)
   }
 
   const goNext = () => {
     const finalScore =
       Math.max(
         0,
-        100 - attempts * 5 - hintsUsed * 10
+        100 -
+          attempts * 5 -
+          hintsUsed * 10
       )
 
     localStorage.setItem(
@@ -367,7 +367,9 @@ export default function Stage1Page() {
       <div className="stage1-stars stage1-stars-two" />
 
       <section className="stage1-cockpit">
+
         <div className="stage1-top-bar">
+
           <button
             className="stage1-back-btn"
             onClick={() =>
@@ -379,12 +381,14 @@ export default function Stage1Page() {
 
           <div className="stage1-top-title">
             المستوى التمهيدي
+
             <span>
               المرحلة الأولى
             </span>
           </div>
 
           <div className="stage1-top-stats">
+
             <div>
               ⭐
               <strong>
@@ -398,10 +402,13 @@ export default function Stage1Page() {
                 {attempts}
               </strong>
             </div>
+
           </div>
+
         </div>
 
         <div className="stage1-window">
+
           <div className="stage1-window-stars" />
 
           <motion.div
@@ -419,6 +426,7 @@ export default function Stage1Page() {
           </motion.div>
 
           <div className="stage1-heading">
+
             <span>
               المهمة 1
             </span>
@@ -430,15 +438,21 @@ export default function Stage1Page() {
             <p>
               ضع المقسوم والمقسوم عليه في المكان الصحيح
             </p>
+
           </div>
 
           <div className="stage1-game-layout">
+
             <div className="stage1-mission-card">
+
               <div className="stage1-question-label">
                 السؤال
               </div>
 
-              <div className="stage1-equation">
+              <div
+                className="stage1-equation"
+                dir="ltr"
+              >
                 36 ÷ 9
               </div>
 
@@ -449,6 +463,7 @@ export default function Stage1Page() {
               </div>
 
               <div className="stage1-mini-info">
+
                 <div>
                   <span>
                     المقسوم
@@ -468,6 +483,7 @@ export default function Stage1Page() {
                     9
                   </strong>
                 </div>
+
               </div>
 
               <AnimatePresence>
@@ -488,22 +504,30 @@ export default function Stage1Page() {
                   </motion.button>
                 )}
               </AnimatePresence>
+
             </div>
 
             <DndContext
               sensors={sensors}
+              onDragStart={handleDragStart}
+              onDragCancel={handleDragCancel}
               onDragEnd={handleDragEnd}
             >
+
               <div className="stage1-board">
+
                 <div className="stage1-board-title">
                   نموذج مساحة المستطيل
                 </div>
 
                 <div className="stage1-board-content">
+
                   <DropZone
                     id="divisor-zone"
                     label="المقسوم عليه"
-                    value={divisor || undefined}
+                    value={
+                      divisor || undefined
+                    }
                     correct={
                       divisor === '9'
                     }
@@ -527,7 +551,9 @@ export default function Stage1Page() {
                   <DropZone
                     id="dividend-zone"
                     label="المقسوم"
-                    value={dividend || undefined}
+                    value={
+                      dividend || undefined
+                    }
                     correct={
                       dividend === '36'
                     }
@@ -536,6 +562,7 @@ export default function Stage1Page() {
                       dividend !== '36'
                     }
                   />
+
                 </div>
 
                 <div className="stage1-cards-title">
@@ -543,6 +570,7 @@ export default function Stage1Page() {
                 </div>
 
                 <div className="stage1-cards-row">
+
                   {cards.map((card) => (
                     <DraggableCard
                       key={card.id}
@@ -550,10 +578,12 @@ export default function Stage1Page() {
                       disabled={
                         usedCardIds.includes(
                           card.id
-                        ) || completed
+                        ) ||
+                        completed
                       }
                     />
                   ))}
+
                 </div>
 
                 <AnimatePresence mode="wait">
@@ -572,19 +602,38 @@ export default function Stage1Page() {
                       opacity: 1,
                       y: 0,
                     }}
-                    exit={{
-                      opacity: 0,
-                    }}
                   >
                     {feedback}
                   </motion.div>
                 </AnimatePresence>
+
               </div>
+
+              {/* THIS IS THE IMPORTANT PART */}
+              <DragOverlay
+                dropAnimation={{
+                  duration: 180,
+                  easing:
+                    'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+                }}
+              >
+                {activeCard ? (
+                  <div
+                    className={`stage1-number-card stage1-drag-overlay ${activeCard.type}`}
+                  >
+                    {activeCard.value}
+                  </div>
+                ) : null}
+              </DragOverlay>
+
             </DndContext>
+
           </div>
 
           <div className="stage1-progress-section">
+
             <div className="stage1-engine-info">
+
               <span>
                 طاقة المحرك
               </span>
@@ -596,9 +645,11 @@ export default function Stage1Page() {
                   ? '30%'
                   : '15%'}
               </strong>
+
             </div>
 
             <div className="stage1-engine-bar">
+
               <motion.div
                 animate={{
                   width: completed
@@ -607,15 +658,16 @@ export default function Stage1Page() {
                     ? '30%'
                     : '15%',
                 }}
-                transition={{
-                  duration: 0.5,
-                }}
               />
+
             </div>
+
           </div>
+
         </div>
 
         <div className="stage1-bottom-panel">
+
           <button
             className="stage1-reset-btn"
             onClick={resetStage}
@@ -634,6 +686,7 @@ export default function Stage1Page() {
             {completed && (
               <motion.button
                 className="stage1-next-btn"
+                onClick={goNext}
                 initial={{
                   opacity: 0,
                   scale: 0.9,
@@ -641,26 +694,15 @@ export default function Stage1Page() {
                 animate={{
                   opacity: 1,
                   scale: 1,
-                  boxShadow: [
-                    '0 0 15px rgba(72,255,101,.3)',
-                    '0 0 35px rgba(72,255,101,.75)',
-                    '0 0 15px rgba(72,255,101,.3)',
-                  ],
                 }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                }}
-                onClick={goNext}
               >
-                المرحلة الثانية
-                <span>
-                  🚀
-                </span>
+                المرحلة الثانية 🚀
               </motion.button>
             )}
           </AnimatePresence>
+
         </div>
+
       </section>
     </main>
   )
