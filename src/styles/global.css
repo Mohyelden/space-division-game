@@ -3529,7 +3529,7 @@ p {
 /* WINDOW */
 
 .planet-map-window {
-  height: 590px;
+  height: 650px;
 
   position: relative;
 
@@ -3620,8 +3620,8 @@ p {
 .map-floating-rocket {
   position: absolute;
 
-  left: 46%;
-  top: 100px;
+  left: 42px;
+  top: 112px;
 
   z-index: 3;
 
@@ -3638,41 +3638,19 @@ p {
 .space-route {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
-.route-line {
-  position: absolute;
-
-  height: 14px;
-
-  border-radius: 100%;
-
-  border-top:
-    4px dotted rgba(116,205,255,.52);
-
-  filter:
-    drop-shadow(
-      0 0 8px rgba(95,184,255,.35)
-    );
-}
-
-.route-line-one {
-  width: 360px;
-
-  left: 20%;
-  top: 53%;
-
-  transform: rotate(-17deg);
-}
-
-.route-line-two {
-  width: 350px;
-
-  right: 15%;
-  top: 57%;
-
-  transform: rotate(18deg);
+.space-route path {
+  fill: none;
+  stroke: rgba(116,205,255,.66);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 1 9;
+  filter: drop-shadow(0 0 4px rgba(95,184,255,.4));
 }
 
 /* PLANETS */
@@ -3697,17 +3675,17 @@ p {
 
 .planet-level-zero {
   left: 8%;
-  top: 33%;
+  top: 180px;
 }
 
 .planet-level-one {
   left: 39%;
-  top: 45%;
+  top: 245px;
 }
 
 .planet-level-two {
   right: 7%;
-  top: 37%;
+  top: 195px;
 }
 
 .planet-surface {
@@ -3909,7 +3887,7 @@ p {
 
 .planet-card.locked {
   cursor: not-allowed;
-  opacity: .78;
+  opacity: 1;
 }
 
 .planet-card.locked:hover {
@@ -3920,6 +3898,7 @@ p {
 
 .map-instruction-box {
   position: absolute;
+  z-index: 5;
 
   left: 50%;
   bottom: 20px;
@@ -3928,8 +3907,8 @@ p {
 
   width:
     min(
-      480px,
-      85%
+      560px,
+      92%
     );
 
   padding:
@@ -3958,8 +3937,8 @@ p {
 }
 
 .map-instruction-box p {
-  font-size: .82rem;
-  line-height: 1.6;
+  font-size: .9rem;
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -4065,12 +4044,12 @@ p {
     display: none;
   }
 
-  .route-line {
+  .space-route {
     display: none;
   }
 
   .map-floating-rocket {
-    top: 110px;
+    top: 130px;
     left: 46%;
   }
 
@@ -4108,6 +4087,12 @@ p {
 
   .map-progress-info {
     min-width: 150px;
+  }
+}
+
+@media (max-width: 650px) {
+  .map-floating-rocket {
+    display: none;
   }
 }
 

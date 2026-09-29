@@ -161,10 +161,9 @@ export default function MapPage() {
             </p>
           </motion.div>
 
-          <div className="space-route">
-            <div className="route-line route-line-one" />
-            <div className="route-line route-line-two" />
-          </div>
+          <svg className="space-route" viewBox="0 0 1000 650" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 162 267 C 285 267, 355 332, 471 332 S 715 282, 849 282" />
+          </svg>
 
           {/* LEVEL 0 */}
 
