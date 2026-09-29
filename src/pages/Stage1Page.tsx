@@ -67,7 +67,7 @@ const initialWrongCounts: WrongCounts = {
 }
 
 /* =========================================================
-   HINT DRAWING ON THE DRAGGABLE CARD
+   CARD HINT
    ========================================================= */
 
 function CardHint({
@@ -96,8 +96,8 @@ function CardHint({
           <motion.span
             className="prep1-card-arrow prep1-card-arrow-dividend"
             animate={{
-              x: [0, 4, 0],
-              y: [0, 4, 0],
+              x: [0, 5, 0],
+              y: [0, 5, 0],
             }}
             transition={{
               duration: 0.8,
@@ -159,15 +159,17 @@ function CardHint({
 }
 
 /* =========================================================
-   DRAGGABLE CARD
+   DRAGGABLE LABEL
    ========================================================= */
 
 function DraggableLabel({
   card,
   showHint,
+  colorHint,
 }: {
   card: ConceptCard
   showHint: boolean
+  colorHint: boolean
 }) {
   const {
     attributes,
@@ -194,6 +196,10 @@ function DraggableLabel({
 
           showHint
             ? 'prep1-label-card-hinted'
+            : '',
+
+          colorHint
+            ? 'prep1-label-color-hint'
             : '',
         ]
           .filter(Boolean)
@@ -279,16 +285,28 @@ function ConceptDropZone({
 }
 
 /* =========================================================
-   NUMBER
+   NUMBER BOX
    ========================================================= */
 
 function NumberBox({
   value,
+  colorHint,
 }: {
   value: string
+  colorHint: boolean
 }) {
   return (
-    <div className="prep1-number-box">
+    <div
+      className={[
+        'prep1-number-box',
+
+        colorHint
+          ? 'prep1-number-color-hint'
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       {value}
     </div>
   )
@@ -329,7 +347,6 @@ export default function Stage1Page() {
     useState(false)
 
   const sensors = useSensors(
-
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 4,
@@ -342,7 +359,6 @@ export default function Stage1Page() {
         tolerance: 5,
       },
     })
-
   )
 
   const score = useMemo(() => {
@@ -370,12 +386,8 @@ export default function Stage1Page() {
   }
 
   /*
-    التلميح يظهر بعد غلطتين
-    في نفس البطاقة.
-
-    مفيش target highlighting.
-    مفيش لون للإجابة.
-    مفيش كشف للمكان.
+    بعد غلطتين:
+    يظهر Hint بالسهم.
   */
   const shouldShowHint = (
     id: ConceptId
@@ -386,9 +398,19 @@ export default function Stage1Page() {
     )
   }
 
-  /* =======================================================
-     DRAG START
-     ======================================================= */
+  /*
+    بعد الغلطة الثالثة:
+    البطاقة + الرقم الصحيح
+    نفس اللون.
+  */
+  const shouldShowColorMatch = (
+    id: ConceptId
+  ) => {
+    return (
+      !cardIsPlaced(id) &&
+      wrongCounts[id] >= 3
+    )
+  }
 
   const handleDragStart = (
     event: DragStartEvent
@@ -405,17 +427,9 @@ export default function Stage1Page() {
     }
   }
 
-  /* =======================================================
-     DRAG CANCEL
-     ======================================================= */
-
   const handleDragCancel = () => {
     setActiveCard(null)
   }
-
-  /* =======================================================
-     DRAG END
-     ======================================================= */
 
   const handleDragEnd = (
     event: DragEndEvent
@@ -458,7 +472,6 @@ export default function Stage1Page() {
     ) {
       const nextPlacements = {
         ...placements,
-
         [dragged.id]:
           dragged.id,
       }
@@ -467,16 +480,10 @@ export default function Stage1Page() {
         nextPlacements
       )
 
-      /*
-        Reset consecutive errors
-        for this card.
-      */
       setWrongCounts(
         prev => ({
           ...prev,
-
-          [dragged.id]:
-            0,
+          [dragged.id]: 0,
         })
       )
 
@@ -501,13 +508,10 @@ export default function Stage1Page() {
        WRONG
        ===================================================== */
 
-    const previousWrong =
+    const nextWrong =
       wrongCounts[
         dragged.id
-      ]
-
-    const nextWrong =
-      previousWrong + 1
+      ] + 1
 
     setAttempts(
       prev => prev + 1
@@ -516,15 +520,11 @@ export default function Stage1Page() {
     setWrongCounts(
       prev => ({
         ...prev,
-
         [dragged.id]:
           nextWrong,
       })
     )
 
-    /*
-      First error
-    */
     if (
       nextWrong === 1
     ) {
@@ -535,10 +535,6 @@ export default function Stage1Page() {
       return
     }
 
-    /*
-      Second error:
-      نفتح التلميح الموجود على البطاقة نفسها.
-    */
     if (
       nextWrong === 2
     ) {
@@ -547,24 +543,30 @@ export default function Stage1Page() {
       )
 
       setFeedback(
-        `لاحظ الرسم الصغير بجوار بطاقة «${dragged.label}» 👀 وحاول معرفة مكانها من شكل السهم.`
+        `لاحظ الرسم والسهم بجوار بطاقة «${dragged.label}» 👀 وحاول معرفة مكانها.`
       )
 
       return
     }
 
-    /*
-      بعد ذلك يظل نفس التلميح.
-      لا نعطي Hint أقوى يكشف الإجابة.
-    */
+    if (
+      nextWrong === 3
+    ) {
+      setHintsUsed(
+        prev => prev + 1
+      )
+
+      setFeedback(
+        `تلميح إضافي 🎨 بطاقة «${dragged.label}» والرقم الصحيح أصبحا بنفس اللون.`
+      )
+
+      return
+    }
+
     setFeedback(
-      `استخدم اتجاه السهم الموجود مع بطاقة «${dragged.label}» وفكر في مكانها داخل نموذج مساحة المستطيل.`
+      `طابق لون بطاقة «${dragged.label}» مع الرقم الذي يحمل نفس اللون.`
     )
   }
-
-  /* =======================================================
-     COMPLETE STAGE
-     ======================================================= */
 
   const completeStage = (
     finalPlacements:
@@ -585,13 +587,8 @@ export default function Stage1Page() {
       JSON.stringify({
         attempts,
         hintsUsed,
-
-        score:
-          finalScore,
-
-        completed:
-          true,
-
+        score: finalScore,
+        completed: true,
         answers:
           finalPlacements,
       })
@@ -624,10 +621,6 @@ export default function Stage1Page() {
     }
   }
 
-  /* =======================================================
-     RESET
-     ======================================================= */
-
   const resetStage = () => {
     setActiveCard(null)
 
@@ -647,10 +640,6 @@ export default function Stage1Page() {
       'اسحب كل بطاقة وضعها في المكان المناسب.'
     )
   }
-
-  /* =======================================================
-     UI
-     ======================================================= */
 
   return (
     <main
@@ -732,15 +721,12 @@ export default function Stage1Page() {
 
           <DndContext
             sensors={sensors}
-
             onDragStart={
               handleDragStart
             }
-
             onDragCancel={
               handleDragCancel
             }
-
             onDragEnd={
               handleDragEnd
             }
@@ -761,7 +747,7 @@ export default function Stage1Page() {
                 </h2>
 
                 <p>
-                  أمامك نموذج مساحة المستطيل، والأرقام موجودة بالفعل في أماكنها.
+                  أمامك نموذج مساحة المستطيل والأرقام موجودة بالفعل في أماكنها.
                 </p>
 
                 <p>
@@ -781,7 +767,15 @@ export default function Stage1Page() {
                 </div>
 
                 <div className="prep1-auto-hint-note">
-                  💡 إذا أخطأت مرتين في نفس البطاقة سيظهر بجوارها رسم صغير يساعدك على التفكير في مكانها.
+
+                  <strong>
+                    💡 نظام المساعدة
+                  </strong>
+
+                  <span>
+                    بعد خطأين يظهر تلميح بالسهم، وإذا أخطأت مرة أخرى تظهر مطابقة بالألوان.
+                  </span>
+
                 </div>
 
               </aside>
@@ -806,11 +800,15 @@ export default function Stage1Page() {
 
                       <NumberBox
                         value="1395"
+                        colorHint={
+                          shouldShowColorMatch(
+                            'dividend'
+                          )
+                        }
                       />
 
                       <ConceptDropZone
                         id="dividend"
-
                         value={
                           placements.dividend
                             ? 'المقسوم'
@@ -826,11 +824,15 @@ export default function Stage1Page() {
 
                       <NumberBox
                         value="0"
+                        colorHint={
+                          shouldShowColorMatch(
+                            'remainder'
+                          )
+                        }
                       />
 
                       <ConceptDropZone
                         id="remainder"
-
                         value={
                           placements.remainder
                             ? 'الباقي'
@@ -848,11 +850,15 @@ export default function Stage1Page() {
 
                     <NumberBox
                       value="5"
+                      colorHint={
+                        shouldShowColorMatch(
+                          'divisor'
+                        )
+                      }
                     />
 
                     <ConceptDropZone
                       id="divisor"
-
                       value={
                         placements.divisor
                           ? 'المقسوم عليه'
@@ -868,11 +874,15 @@ export default function Stage1Page() {
 
                     <NumberBox
                       value="279"
+                      colorHint={
+                        shouldShowColorMatch(
+                          'quotient'
+                        )
+                      }
                     />
 
                     <ConceptDropZone
                       id="quotient"
-
                       value={
                         placements.quotient
                           ? 'ناتج القسمة'
@@ -911,13 +921,16 @@ export default function Stage1Page() {
                         key={
                           card.id
                         }
-
                         card={
                           card
                         }
-
                         showHint={
                           shouldShowHint(
+                            card.id
+                          )
+                        }
+                        colorHint={
+                          shouldShowColorMatch(
                             card.id
                           )
                         }
@@ -928,12 +941,10 @@ export default function Stage1Page() {
                 {completed && (
                   <motion.div
                     className="prep1-all-placed"
-
                     initial={{
                       opacity: 0,
                       scale: 0.9,
                     }}
-
                     animate={{
                       opacity: 1,
                       scale: 1,
@@ -952,7 +963,6 @@ export default function Stage1Page() {
             <DragOverlay
               dropAnimation={{
                 duration: 180,
-
                 easing:
                   'cubic-bezier(0.18,0.67,0.6,1.22)',
               }}
@@ -961,8 +971,22 @@ export default function Stage1Page() {
               {activeCard ? (
                 <div className="prep1-overlay-wrapper">
 
-                  <div className="prep1-drag-overlay">
-                    {activeCard.label}
+                  <div
+                    className={[
+                      'prep1-drag-overlay',
+
+                      shouldShowColorMatch(
+                        activeCard.id
+                      )
+                        ? 'prep1-label-color-hint'
+                        : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    {
+                      activeCard.label
+                    }
                   </div>
 
                   {shouldShowHint(
@@ -988,7 +1012,6 @@ export default function Stage1Page() {
 
             <motion.div
               key={feedback}
-
               className={[
                 'prep1-feedback',
 
@@ -998,12 +1021,10 @@ export default function Stage1Page() {
               ]
                 .filter(Boolean)
                 .join(' ')}
-
               initial={{
                 opacity: 0,
                 y: 8,
               }}
-
               animate={{
                 opacity: 1,
                 y: 0,
@@ -1029,7 +1050,6 @@ export default function Stage1Page() {
                   width:
                     `${progress}%`,
                 }}
-
                 transition={{
                   duration: 0.4,
                 }}
@@ -1054,7 +1074,6 @@ export default function Stage1Page() {
 
           <button
             className="prep1-reset"
-
             onClick={
               resetStage
             }
@@ -1074,12 +1093,10 @@ export default function Stage1Page() {
             {completed && (
               <motion.button
                 className="prep1-next"
-
                 initial={{
                   opacity: 0,
                   scale: 0.9,
                 }}
-
                 animate={{
                   opacity: 1,
                   scale: 1,
@@ -1090,12 +1107,10 @@ export default function Stage1Page() {
                     '0 0 15px rgba(73,255,105,.3)',
                   ],
                 }}
-
                 transition={{
                   duration: 1.5,
                   repeat: Infinity,
                 }}
-
                 onClick={() =>
                   navigate(
                     '/level/0/stage/2'
