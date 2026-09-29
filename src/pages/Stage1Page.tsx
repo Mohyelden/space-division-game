@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+
 import {
   DndContext,
   DragEndEvent,
@@ -11,34 +12,162 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { AnimatePresence, motion } from 'framer-motion'
+
+import {
+  AnimatePresence,
+  motion,
+} from 'framer-motion'
+
 import { useNavigate } from 'react-router-dom'
 
-type CardType = {
-  id: string
-  value: string
-  type: 'dividend' | 'divisor'
+type ConceptId =
+  | 'dividend'
+  | 'divisor'
+  | 'quotient'
+  | 'remainder'
+
+type ConceptCard = {
+  id: ConceptId
+  label: string
 }
 
-const cards: CardType[] = [
+type Placements = Partial<
+  Record<ConceptId, ConceptId>
+>
+
+type WrongCounts = Record<
+  ConceptId,
+  number
+>
+
+const cards: ConceptCard[] = [
   {
-    id: 'dividend-card',
-    value: '36',
-    type: 'dividend',
+    id: 'dividend',
+    label: 'المقسوم',
   },
   {
-    id: 'divisor-card',
-    value: '9',
-    type: 'divisor',
+    id: 'divisor',
+    label: 'المقسوم عليه',
+  },
+  {
+    id: 'quotient',
+    label: 'ناتج القسمة',
+  },
+  {
+    id: 'remainder',
+    label: 'الباقي',
   },
 ]
 
-function DraggableCard({
-  card,
-  disabled,
+const initialWrongCounts: WrongCounts = {
+  dividend: 0,
+  divisor: 0,
+  quotient: 0,
+  remainder: 0,
+}
+
+/* =========================================================
+   HINT DRAWING ON THE DRAGGABLE CARD
+   ========================================================= */
+
+function CardHint({
+  type,
 }: {
-  card: CardType
-  disabled: boolean
+  type: ConceptId
+}) {
+  return (
+    <motion.div
+      className={[
+        'prep1-card-hint',
+        `prep1-card-hint-${type}`,
+      ].join(' ')}
+      initial={{
+        opacity: 0,
+        scale: 0.85,
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+      }}
+    >
+      <div className="prep1-card-hint-rectangle">
+
+        {type === 'dividend' && (
+          <motion.span
+            className="prep1-card-arrow prep1-card-arrow-dividend"
+            animate={{
+              x: [0, 4, 0],
+              y: [0, 4, 0],
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity,
+            }}
+          >
+            ↘
+          </motion.span>
+        )}
+
+        {type === 'divisor' && (
+          <motion.span
+            className="prep1-card-arrow prep1-card-arrow-divisor"
+            animate={{
+              x: [0, -6, 0],
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity,
+            }}
+          >
+            ←
+          </motion.span>
+        )}
+
+        {type === 'quotient' && (
+          <motion.span
+            className="prep1-card-arrow prep1-card-arrow-quotient"
+            animate={{
+              x: [0, 6, 0],
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity,
+            }}
+          >
+            →
+          </motion.span>
+        )}
+
+        {type === 'remainder' && (
+          <motion.span
+            className="prep1-card-arrow prep1-card-arrow-remainder"
+            animate={{
+              y: [0, 6, 0],
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity,
+            }}
+          >
+            ↓
+          </motion.span>
+        )}
+
+      </div>
+    </motion.div>
+  )
+}
+
+/* =========================================================
+   DRAGGABLE CARD
+   ========================================================= */
+
+function DraggableLabel({
+  card,
+  showHint,
+}: {
+  card: ConceptCard
+  showHint: boolean
 }) {
   const {
     attributes,
@@ -47,106 +176,143 @@ function DraggableCard({
     isDragging,
   } = useDraggable({
     id: card.id,
-    disabled,
   })
 
   return (
-    <button
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      className={[
-        'stage1-number-card',
-        card.type,
-        isDragging ? 'dragging-source' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      disabled={disabled}
-    >
-      {card.value}
-    </button>
+    <div className="prep1-drag-card-wrapper">
+
+      <button
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        className={[
+          'prep1-label-card',
+
+          isDragging
+            ? 'prep1-drag-source'
+            : '',
+
+          showHint
+            ? 'prep1-label-card-hinted'
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        {card.label}
+      </button>
+
+      <AnimatePresence>
+        {showHint && (
+          <CardHint
+            type={card.id}
+          />
+        )}
+      </AnimatePresence>
+
+    </div>
   )
 }
 
-function DropZone({
+/* =========================================================
+   DROP ZONE
+   ========================================================= */
+
+function ConceptDropZone({
   id,
-  label,
   value,
-  correct,
-  hintActive,
 }: {
-  id: string
-  label: string
+  id: ConceptId
   value?: string
-  correct: boolean
-  hintActive: boolean
 }) {
   const {
-    isOver,
     setNodeRef,
+    isOver,
   } = useDroppable({
-    id,
+    id: `zone-${id}`,
   })
 
   return (
-    <motion.div
+    <div
       ref={setNodeRef}
       className={[
-        'stage1-drop-zone',
-        isOver ? 'over' : '',
-        correct ? 'correct' : '',
-        hintActive ? 'hint-active' : '',
+        'prep1-drop-zone',
+
+        isOver
+          ? 'prep1-zone-over'
+          : '',
+
+        value
+          ? 'prep1-zone-correct'
+          : '',
       ]
         .filter(Boolean)
         .join(' ')}
-      animate={
-        hintActive
-          ? {
-              boxShadow: [
-                '0 0 10px rgba(255,220,70,.25)',
-                '0 0 28px rgba(255,220,70,.8)',
-                '0 0 10px rgba(255,220,70,.25)',
-              ],
-            }
-          : {}
-      }
-      transition={{
-        duration: 1.2,
-        repeat: hintActive ? Infinity : 0,
-      }}
     >
-      <span className="stage1-drop-label">
-        {label}
-      </span>
-
       {value ? (
-        <strong className="stage1-dropped-value">
-          {value}
-        </strong>
-      ) : (
-        <span className="stage1-drop-placeholder">
-          اسحب هنا
-        </span>
-      )}
+        <>
+          <motion.strong
+            className="prep1-drop-value"
+            initial={{
+              opacity: 0,
+              scale: 0.7,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+          >
+            {value}
+          </motion.strong>
 
-      {correct && (
-        <span className="stage1-correct-icon">
-          ✓
+          <span className="prep1-correct-check">
+            ✓
+          </span>
+        </>
+      ) : (
+        <span className="prep1-empty-text">
+          ضع البطاقة هنا
         </span>
       )}
-    </motion.div>
+    </div>
   )
 }
+
+/* =========================================================
+   NUMBER
+   ========================================================= */
+
+function NumberBox({
+  value,
+}: {
+  value: string
+}) {
+  return (
+    <div className="prep1-number-box">
+      {value}
+    </div>
+  )
+}
+
+/* =========================================================
+   PAGE
+   ========================================================= */
 
 export default function Stage1Page() {
   const navigate = useNavigate()
 
-  const [dividend, setDividend] =
-    useState<string | null>(null)
+  const [activeCard, setActiveCard] =
+    useState<ConceptCard | null>(
+      null
+    )
 
-  const [divisor, setDivisor] =
-    useState<string | null>(null)
+  const [placements, setPlacements] =
+    useState<Placements>({})
+
+  const [wrongCounts, setWrongCounts] =
+    useState<WrongCounts>(
+      initialWrongCounts
+    )
 
   const [attempts, setAttempts] =
     useState(0)
@@ -156,30 +322,27 @@ export default function Stage1Page() {
 
   const [feedback, setFeedback] =
     useState(
-      'اسحب كل بطاقة إلى مكانها الصحيح حول نموذج مساحة المستطيل.'
+      'اسحب كل بطاقة وضعها في المكان المناسب.'
     )
-
-  const [showHint, setShowHint] =
-    useState(false)
 
   const [completed, setCompleted] =
     useState(false)
 
-  const [activeCard, setActiveCard] =
-    useState<CardType | null>(null)
-
   const sensors = useSensors(
+
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 4,
       },
     }),
+
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 100,
+        delay: 120,
         tolerance: 5,
       },
     })
+
   )
 
   const score = useMemo(() => {
@@ -187,162 +350,234 @@ export default function Stage1Page() {
       0,
       100 -
         attempts * 5 -
-        hintsUsed * 10
+        hintsUsed * 5
     )
-  }, [attempts, hintsUsed])
+  }, [
+    attempts,
+    hintsUsed,
+  ])
 
-  const usedCardIds = useMemo(() => {
-    const used: string[] = []
+  const correctCount =
+    Object.keys(placements).length
 
-    if (dividend === '36') {
-      used.push('dividend-card')
-    }
+  const progress =
+    (correctCount / 4) * 100
 
-    if (divisor === '9') {
-      used.push('divisor-card')
-    }
-
-    return used
-  }, [dividend, divisor])
-
-  const checkCompletion = (
-    nextDividend: string | null,
-    nextDivisor: string | null
+  const cardIsPlaced = (
+    id: ConceptId
   ) => {
-    if (
-      nextDividend === '36' &&
-      nextDivisor === '9'
-    ) {
-      setCompleted(true)
-
-      setFeedback(
-        'ممتاز! وضعت المقسوم والمقسوم عليه في المكان الصحيح.'
-      )
-    }
+    return placements[id] === id
   }
+
+  /*
+    التلميح يظهر بعد غلطتين
+    في نفس البطاقة.
+
+    مفيش target highlighting.
+    مفيش لون للإجابة.
+    مفيش كشف للمكان.
+  */
+  const shouldShowHint = (
+    id: ConceptId
+  ) => {
+    return (
+      !cardIsPlaced(id) &&
+      wrongCounts[id] >= 2
+    )
+  }
+
+  /* =======================================================
+     DRAG START
+     ======================================================= */
 
   const handleDragStart = (
     event: DragStartEvent
   ) => {
-    const card = cards.find(
-      (item) =>
-        item.id === event.active.id
-    )
+    const card =
+      cards.find(
+        item =>
+          item.id ===
+          event.active.id
+      )
 
     if (card) {
       setActiveCard(card)
     }
   }
 
+  /* =======================================================
+     DRAG CANCEL
+     ======================================================= */
+
   const handleDragCancel = () => {
     setActiveCard(null)
   }
 
+  /* =======================================================
+     DRAG END
+     ======================================================= */
+
   const handleDragEnd = (
     event: DragEndEvent
   ) => {
-    const { active, over } = event
+    const {
+      active,
+      over,
+    } = event
+
+    const dragged =
+      cards.find(
+        card =>
+          card.id ===
+          active.id
+      )
 
     setActiveCard(null)
 
-    if (!over || completed) {
+    if (
+      !dragged ||
+      !over ||
+      completed
+    ) {
       return
     }
 
-    const card = cards.find(
-      (item) =>
-        item.id === active.id
-    )
+    const targetId =
+      String(over.id).replace(
+        'zone-',
+        ''
+      ) as ConceptId
 
-    if (!card) {
-      return
-    }
+    /* =====================================================
+       CORRECT
+       ===================================================== */
 
-    const target = over.id
+    if (
+      dragged.id ===
+      targetId
+    ) {
+      const nextPlacements = {
+        ...placements,
 
-    const isCorrectDrop =
-      (card.type === 'dividend' &&
-        target === 'dividend-zone') ||
-      (card.type === 'divisor' &&
-        target === 'divisor-zone')
+        [dragged.id]:
+          dragged.id,
+      }
 
-    if (!isCorrectDrop) {
-      const nextAttempts =
-        attempts + 1
-
-      setAttempts(nextAttempts)
-
-      setFeedback(
-        'ليست هنا. حاول مرة أخرى 👀'
+      setPlacements(
+        nextPlacements
       )
 
-      if (nextAttempts >= 2) {
-        setShowHint(true)
+      /*
+        Reset consecutive errors
+        for this card.
+      */
+      setWrongCounts(
+        prev => ({
+          ...prev,
+
+          [dragged.id]:
+            0,
+        })
+      )
+
+      setFeedback(
+        `أحسنت ⭐ وضعت بطاقة «${dragged.label}» في مكانها الصحيح.`
+      )
+
+      if (
+        Object.keys(
+          nextPlacements
+        ).length === 4
+      ) {
+        completeStage(
+          nextPlacements
+        )
       }
 
       return
     }
 
-    let nextDividend = dividend
-    let nextDivisor = divisor
+    /* =====================================================
+       WRONG
+       ===================================================== */
 
-    if (card.type === 'dividend') {
-      nextDividend = card.value
+    const previousWrong =
+      wrongCounts[
+        dragged.id
+      ]
 
-      setDividend(card.value)
+    const nextWrong =
+      previousWrong + 1
 
+    setAttempts(
+      prev => prev + 1
+    )
+
+    setWrongCounts(
+      prev => ({
+        ...prev,
+
+        [dragged.id]:
+          nextWrong,
+      })
+    )
+
+    /*
+      First error
+    */
+    if (
+      nextWrong === 1
+    ) {
       setFeedback(
-        'أحسنت! وضعت المقسوم في مكانه الصحيح.'
+        `مكان غير صحيح لبطاقة «${dragged.label}». حاول مرة أخرى.`
       )
+
+      return
     }
 
-    if (card.type === 'divisor') {
-      nextDivisor = card.value
-
-      setDivisor(card.value)
+    /*
+      Second error:
+      نفتح التلميح الموجود على البطاقة نفسها.
+    */
+    if (
+      nextWrong === 2
+    ) {
+      setHintsUsed(
+        prev => prev + 1
+      )
 
       setFeedback(
-        'رائع! وضعت المقسوم عليه في مكانه الصحيح.'
+        `لاحظ الرسم الصغير بجوار بطاقة «${dragged.label}» 👀 وحاول معرفة مكانها من شكل السهم.`
       )
+
+      return
     }
 
-    checkCompletion(
-      nextDividend,
-      nextDivisor
-    )
-  }
-
-  const useHint = () => {
-    setHintsUsed(
-      (prev) => prev + 1
-    )
-
+    /*
+      بعد ذلك يظل نفس التلميح.
+      لا نعطي Hint أقوى يكشف الإجابة.
+    */
     setFeedback(
-      'التلميح: 36 هو المقسوم، و9 هو المقسوم عليه.'
+      `استخدم اتجاه السهم الموجود مع بطاقة «${dragged.label}» وفكر في مكانها داخل نموذج مساحة المستطيل.`
     )
   }
 
-  const resetStage = () => {
-    setDividend(null)
-    setDivisor(null)
-    setAttempts(0)
-    setHintsUsed(0)
-    setShowHint(false)
-    setCompleted(false)
-    setActiveCard(null)
+  /* =======================================================
+     COMPLETE STAGE
+     ======================================================= */
 
-    setFeedback(
-      'اسحب كل بطاقة إلى مكانها الصحيح حول نموذج مساحة المستطيل.'
-    )
-  }
+  const completeStage = (
+    finalPlacements:
+      Placements
+  ) => {
+    setCompleted(true)
 
-  const goNext = () => {
     const finalScore =
       Math.max(
         0,
         100 -
           attempts * 5 -
-          hintsUsed * 10
+          hintsUsed * 5
       )
 
     localStorage.setItem(
@@ -350,44 +585,112 @@ export default function Stage1Page() {
       JSON.stringify({
         attempts,
         hintsUsed,
-        score: finalScore,
-        completed: true,
+
+        score:
+          finalScore,
+
+        completed:
+          true,
+
+        answers:
+          finalPlacements,
       })
     )
 
-    navigate('/level/0/stage/2')
+    setFeedback(
+      'ممتاز يا بطل 🎉 تعرفت على المقسوم والمقسوم عليه وناتج القسمة والباقي.'
+    )
+
+    try {
+      const utterance =
+        new SpeechSynthesisUtterance(
+          'أحسنت يا بطل. لقد اجتزت المرحلة الأولى بنجاح.'
+        )
+
+      utterance.lang =
+        'ar-EG'
+
+      window
+        .speechSynthesis
+        .cancel()
+
+      window
+        .speechSynthesis
+        .speak(
+          utterance
+        )
+    } catch {
+      // ignore
+    }
   }
+
+  /* =======================================================
+     RESET
+     ======================================================= */
+
+  const resetStage = () => {
+    setActiveCard(null)
+
+    setPlacements({})
+
+    setWrongCounts(
+      initialWrongCounts
+    )
+
+    setAttempts(0)
+
+    setHintsUsed(0)
+
+    setCompleted(false)
+
+    setFeedback(
+      'اسحب كل بطاقة وضعها في المكان المناسب.'
+    )
+  }
+
+  /* =======================================================
+     UI
+     ======================================================= */
 
   return (
     <main
-      className="stage1-space-page"
+      className="prep1-page"
       dir="rtl"
     >
-      <div className="stage1-stars stage1-stars-one" />
-      <div className="stage1-stars stage1-stars-two" />
 
-      <section className="stage1-cockpit">
+      <div className="prep1-stars prep1-stars-a" />
+      <div className="prep1-stars prep1-stars-b" />
 
-        <div className="stage1-top-bar">
+      <section className="prep1-console">
+
+        {/* HEADER */}
+
+        <header className="prep1-header">
 
           <button
-            className="stage1-back-btn"
+            className="prep1-back"
             onClick={() =>
-              navigate('/tutorial')
+              navigate(
+                '/tutorial'
+              )
             }
           >
             ←
           </button>
 
-          <div className="stage1-top-title">
-            المستوى التمهيدي
+          <div className="prep1-header-title">
+
+            <strong>
+              المستوى التمهيدي
+            </strong>
 
             <span>
-              المرحلة الأولى
+              المرحلة الأولى • التعرف على مكونات القسمة
             </span>
+
           </div>
 
-          <div className="stage1-top-stats">
+          <div className="prep1-stats">
 
             <div>
               ⭐
@@ -405,277 +708,361 @@ export default function Stage1Page() {
 
           </div>
 
-        </div>
+        </header>
 
-        <div className="stage1-window">
+        {/* MAIN */}
 
-          <div className="stage1-window-stars" />
+        <section className="prep1-main">
 
-          <motion.div
-            className="stage1-astronaut"
-            animate={{
-              y: [0, -7, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          >
-            👨‍🚀
-          </motion.div>
-
-          <div className="stage1-heading">
+          <div className="prep1-title">
 
             <span>
               المهمة 1
             </span>
 
             <h1>
-              جهّز نموذج القسمة
+              تعرّف على أجزاء القسمة
             </h1>
 
             <p>
-              ضع المقسوم والمقسوم عليه في المكان الصحيح
+              اسحب كل بطاقة وضعها في المكان الذي يمثل معناها.
             </p>
 
           </div>
 
-          <div className="stage1-game-layout">
+          <DndContext
+            sensors={sensors}
 
-            <div className="stage1-mission-card">
+            onDragStart={
+              handleDragStart
+            }
 
-              <div className="stage1-question-label">
-                السؤال
-              </div>
+            onDragCancel={
+              handleDragCancel
+            }
 
-              <div
-                className="stage1-equation"
-                dir="ltr"
-              >
-                36 ÷ 9
-              </div>
+            onDragEnd={
+              handleDragEnd
+            }
+          >
 
-              <div className="stage1-mission-text">
+            <div className="prep1-game">
+
+              {/* INFO */}
+
+              <aside className="prep1-info-panel">
+
+                <div className="prep1-info-icon">
+                  👨‍🚀
+                </div>
+
+                <h2>
+                  تعليمات المهمة
+                </h2>
+
                 <p>
-                  قبل أن نبدأ الحساب، نحتاج لترتيب عناصر القسمة حول نموذج مساحة المستطيل.
+                  أمامك نموذج مساحة المستطيل، والأرقام موجودة بالفعل في أماكنها.
                 </p>
-              </div>
 
-              <div className="stage1-mini-info">
+                <p>
+                  اسحب اسم كل جزء من أجزاء القسمة وضعه في مكانه الصحيح.
+                </p>
 
-                <div>
+                <div className="prep1-mini-progress">
+
                   <span>
-                    المقسوم
+                    تم حل
                   </span>
 
-                  <strong>
-                    36
+                  <strong dir="ltr">
+                    {correctCount} / 4
                   </strong>
+
                 </div>
 
-                <div>
-                  <span>
-                    المقسوم عليه
-                  </span>
-
-                  <strong>
-                    9
-                  </strong>
+                <div className="prep1-auto-hint-note">
+                  💡 إذا أخطأت مرتين في نفس البطاقة سيظهر بجوارها رسم صغير يساعدك على التفكير في مكانها.
                 </div>
 
-              </div>
+              </aside>
 
-              <AnimatePresence>
-                {showHint && (
-                  <motion.button
-                    className="stage1-hint-btn"
-                    initial={{
-                      opacity: 0,
-                      y: 10,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    onClick={useHint}
-                  >
-                    💡 استخدم تلميح
-                  </motion.button>
-                )}
-              </AnimatePresence>
+              {/* BOARD */}
 
-            </div>
+              <section className="prep1-board">
 
-            <DndContext
-              sensors={sensors}
-              onDragStart={handleDragStart}
-              onDragCancel={handleDragCancel}
-              onDragEnd={handleDragEnd}
-            >
-
-              <div className="stage1-board">
-
-                <div className="stage1-board-title">
+                <div className="prep1-board-label">
                   نموذج مساحة المستطيل
                 </div>
 
-                <div className="stage1-board-content">
+                <div className="prep1-model-canvas">
 
-                  <DropZone
-                    id="divisor-zone"
-                    label="المقسوم عليه"
-                    value={
-                      divisor || undefined
-                    }
-                    correct={
-                      divisor === '9'
-                    }
-                    hintActive={
-                      showHint &&
-                      divisor !== '9'
-                    }
-                  />
+                  {/* MAIN RECTANGLE */}
 
-                  <div className="stage1-area-model">
-                    <div />
-                    <div />
-                    <div />
-                    <div />
+                  <div className="prep1-area-rectangle">
 
-                    <div className="stage1-area-center">
-                      ?
+                    {/* DIVIDEND */}
+
+                    <div className="prep1-position prep1-position-dividend">
+
+                      <NumberBox
+                        value="1395"
+                      />
+
+                      <ConceptDropZone
+                        id="dividend"
+
+                        value={
+                          placements.dividend
+                            ? 'المقسوم'
+                            : undefined
+                        }
+                      />
+
                     </div>
+
+                    {/* REMAINDER */}
+
+                    <div className="prep1-position prep1-position-remainder">
+
+                      <NumberBox
+                        value="0"
+                      />
+
+                      <ConceptDropZone
+                        id="remainder"
+
+                        value={
+                          placements.remainder
+                            ? 'الباقي'
+                            : undefined
+                        }
+                      />
+
+                    </div>
+
                   </div>
 
-                  <DropZone
-                    id="dividend-zone"
-                    label="المقسوم"
-                    value={
-                      dividend || undefined
-                    }
-                    correct={
-                      dividend === '36'
-                    }
-                    hintActive={
-                      showHint &&
-                      dividend !== '36'
-                    }
-                  />
+                  {/* DIVISOR */}
 
-                </div>
+                  <div className="prep1-position prep1-position-divisor">
 
-                <div className="stage1-cards-title">
-                  اسحب البطاقات
-                </div>
+                    <NumberBox
+                      value="5"
+                    />
 
-                <div className="stage1-cards-row">
+                    <ConceptDropZone
+                      id="divisor"
 
-                  {cards.map((card) => (
-                    <DraggableCard
-                      key={card.id}
-                      card={card}
-                      disabled={
-                        usedCardIds.includes(
-                          card.id
-                        ) ||
-                        completed
+                      value={
+                        placements.divisor
+                          ? 'المقسوم عليه'
+                          : undefined
                       }
                     />
-                  ))}
+
+                  </div>
+
+                  {/* QUOTIENT */}
+
+                  <div className="prep1-position prep1-position-quotient">
+
+                    <NumberBox
+                      value="279"
+                    />
+
+                    <ConceptDropZone
+                      id="quotient"
+
+                      value={
+                        placements.quotient
+                          ? 'ناتج القسمة'
+                          : undefined
+                      }
+                    />
+
+                  </div>
 
                 </div>
 
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={feedback}
-                    className={`stage1-feedback ${
-                      completed
-                        ? 'success'
-                        : ''
-                    }`}
-                    initial={{
-                      opacity: 0,
-                      y: 8,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                  >
-                    {feedback}
-                  </motion.div>
-                </AnimatePresence>
-
-              </div>
-
-              {/* THIS IS THE IMPORTANT PART */}
-              <DragOverlay
-                dropAnimation={{
-                  duration: 180,
-                  easing:
-                    'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-                }}
-              >
-                {activeCard ? (
-                  <div
-                    className={`stage1-number-card stage1-drag-overlay ${activeCard.type}`}
-                  >
-                    {activeCard.value}
-                  </div>
-                ) : null}
-              </DragOverlay>
-
-            </DndContext>
-
-          </div>
-
-          <div className="stage1-progress-section">
-
-            <div className="stage1-engine-info">
-
-              <span>
-                طاقة المحرك
-              </span>
-
-              <strong>
-                {completed
-                  ? '50%'
-                  : dividend || divisor
-                  ? '30%'
-                  : '15%'}
-              </strong>
+              </section>
 
             </div>
 
-            <div className="stage1-engine-bar">
+            {/* CARD BANK */}
+
+            <section className="prep1-card-bank">
+
+              <span className="prep1-card-bank-title">
+                اسحب البطاقات
+              </span>
+
+              <div className="prep1-card-row">
+
+                {cards
+                  .filter(
+                    card =>
+                      !cardIsPlaced(
+                        card.id
+                      )
+                  )
+                  .map(
+                    card => (
+                      <DraggableLabel
+                        key={
+                          card.id
+                        }
+
+                        card={
+                          card
+                        }
+
+                        showHint={
+                          shouldShowHint(
+                            card.id
+                          )
+                        }
+                      />
+                    )
+                  )}
+
+                {completed && (
+                  <motion.div
+                    className="prep1-all-placed"
+
+                    initial={{
+                      opacity: 0,
+                      scale: 0.9,
+                    }}
+
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                    }}
+                  >
+                    ✓ تم وضع جميع البطاقات
+                  </motion.div>
+                )}
+
+              </div>
+
+            </section>
+
+            {/* DRAG OVERLAY */}
+
+            <DragOverlay
+              dropAnimation={{
+                duration: 180,
+
+                easing:
+                  'cubic-bezier(0.18,0.67,0.6,1.22)',
+              }}
+            >
+
+              {activeCard ? (
+                <div className="prep1-overlay-wrapper">
+
+                  <div className="prep1-drag-overlay">
+                    {activeCard.label}
+                  </div>
+
+                  {shouldShowHint(
+                    activeCard.id
+                  ) && (
+                    <CardHint
+                      type={
+                        activeCard.id
+                      }
+                    />
+                  )}
+
+                </div>
+              ) : null}
+
+            </DragOverlay>
+
+          </DndContext>
+
+          {/* FEEDBACK */}
+
+          <AnimatePresence mode="wait">
+
+            <motion.div
+              key={feedback}
+
+              className={[
+                'prep1-feedback',
+
+                completed
+                  ? 'success'
+                  : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+
+              initial={{
+                opacity: 0,
+                y: 8,
+              }}
+
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+            >
+              {feedback}
+            </motion.div>
+
+          </AnimatePresence>
+
+          {/* PROGRESS */}
+
+          <div className="prep1-progress">
+
+            <span>
+              تقدم المرحلة
+            </span>
+
+            <div className="prep1-progress-track">
 
               <motion.div
                 animate={{
-                  width: completed
-                    ? '50%'
-                    : dividend || divisor
-                    ? '30%'
-                    : '15%',
+                  width:
+                    `${progress}%`,
+                }}
+
+                transition={{
+                  duration: 0.4,
                 }}
               />
 
             </div>
 
+            <strong dir="ltr">
+              {Math.round(
+                progress
+              )}
+              %
+            </strong>
+
           </div>
 
-        </div>
+        </section>
 
-        <div className="stage1-bottom-panel">
+        {/* FOOTER */}
+
+        <footer className="prep1-footer">
 
           <button
-            className="stage1-reset-btn"
-            onClick={resetStage}
+            className="prep1-reset"
+
+            onClick={
+              resetStage
+            }
           >
             ↻ إعادة المحاولة
           </button>
 
-          <div className="stage1-console-lights">
+          <div className="prep1-footer-lights">
             <span />
             <span />
             <span />
@@ -683,27 +1070,48 @@ export default function Stage1Page() {
           </div>
 
           <AnimatePresence>
+
             {completed && (
               <motion.button
-                className="stage1-next-btn"
-                onClick={goNext}
+                className="prep1-next"
+
                 initial={{
                   opacity: 0,
                   scale: 0.9,
                 }}
+
                 animate={{
                   opacity: 1,
                   scale: 1,
+
+                  boxShadow: [
+                    '0 0 15px rgba(73,255,105,.3)',
+                    '0 0 35px rgba(73,255,105,.7)',
+                    '0 0 15px rgba(73,255,105,.3)',
+                  ],
                 }}
+
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                }}
+
+                onClick={() =>
+                  navigate(
+                    '/level/0/stage/2'
+                  )
+                }
               >
                 المرحلة الثانية 🚀
               </motion.button>
             )}
+
           </AnimatePresence>
 
-        </div>
+        </footer>
 
       </section>
+
     </main>
   )
 }

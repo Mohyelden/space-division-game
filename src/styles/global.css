@@ -10320,3 +10320,1645 @@ p {
     opacity: 1;
   }
 }
+
+/* =========================================================
+   PREPARATORY LEVEL - STAGE 1
+   ========================================================= */
+
+.prep1-page {
+  min-height: 100vh;
+
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(96,48,255,.33),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 84% 38%,
+      rgba(0,158,255,.18),
+      transparent 28%
+    ),
+    linear-gradient(
+      145deg,
+      #050718,
+      #09153b 50%,
+      #10082d
+    );
+}
+
+/* =========================================================
+   STARS
+   ========================================================= */
+
+.prep1-stars {
+  position: absolute;
+
+  inset: -100px;
+
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(255,255,255,.9) 1px,
+      transparent 1.4px
+    );
+}
+
+.prep1-stars-a {
+  background-size:
+    58px 58px;
+
+  opacity: .55;
+
+  animation:
+    prep1StarsA 38s
+    linear infinite;
+}
+
+.prep1-stars-b {
+  background-size:
+    110px 110px;
+
+  opacity: .22;
+
+  animation:
+    prep1StarsB 56s
+    linear infinite;
+}
+
+@keyframes prep1StarsA {
+  to {
+    transform:
+      translateY(130px);
+  }
+}
+
+@keyframes prep1StarsB {
+  to {
+    transform:
+      translate(
+        -80px,
+        110px
+      );
+  }
+}
+
+/* =========================================================
+   MAIN CONSOLE
+   ========================================================= */
+
+.prep1-console {
+  width:
+    min(
+      1220px,
+      97vw
+    );
+
+  position: relative;
+
+  z-index: 3;
+
+  padding:
+    18px 30px 22px;
+
+  border-radius:
+    38px;
+
+  border:
+    2px solid
+    rgba(123,177,255,.22);
+
+  background:
+    linear-gradient(
+      145deg,
+      #30446a,
+      #17294b 10%,
+      #0a1736 25%,
+      #09122e 75%,
+      #273a5d
+    );
+
+  box-shadow:
+    0 40px 120px
+      rgba(0,0,0,.55),
+    inset 0 0 38px
+      rgba(100,155,255,.08);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.prep1-header {
+  min-height: 55px;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+}
+
+.prep1-back {
+  justify-self: start;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 13px;
+
+  border:
+    1px solid
+    rgba(115,178,255,.34);
+
+  background:
+    linear-gradient(
+      #294572,
+      #172947
+    );
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 1.2rem;
+}
+
+.prep1-header-title {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+}
+
+.prep1-header-title strong {
+  color: white;
+
+  font-size: .95rem;
+}
+
+.prep1-header-title span {
+  margin-top: 3px;
+
+  color: #6ee7ff;
+
+  font-size: .7rem;
+
+  font-weight: 800;
+}
+
+.prep1-stats {
+  justify-self: end;
+
+  display: flex;
+
+  gap: 8px;
+}
+
+.prep1-stats div {
+  min-width: 72px;
+
+  padding: 8px 10px;
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  background:
+    rgba(7,24,59,.78);
+
+  border:
+    1px solid
+    rgba(107,170,255,.2);
+
+  color: white;
+}
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.prep1-main {
+  min-height: 625px;
+
+  position: relative;
+
+  overflow: hidden;
+
+  padding:
+    18px 26px 20px;
+
+  border-radius: 29px;
+
+  border:
+    2px solid
+    rgba(76,144,255,.22);
+
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(62,105,210,.13),
+      transparent 45%
+    ),
+    #06122e;
+}
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.prep1-title {
+  text-align: center;
+}
+
+.prep1-title > span {
+  color: #ffe36d;
+
+  font-size: .72rem;
+
+  font-weight: 900;
+}
+
+.prep1-title h1 {
+  margin: 2px 0;
+
+  color: white;
+
+  font-size: 2rem;
+
+  font-weight: 900;
+}
+
+.prep1-title p {
+  margin: 3px 0 0;
+
+  color: #83e8ff;
+
+  font-size: .82rem;
+
+  font-weight: 800;
+}
+
+/* =========================================================
+   GAME LAYOUT
+   ========================================================= */
+
+.prep1-game {
+  width:
+    min(
+      1050px,
+      97%
+    );
+
+  margin:
+    22px auto 0;
+
+  display: grid;
+
+  grid-template-columns:
+    255px 1fr;
+
+  gap: 20px;
+
+  direction: ltr;
+}
+
+/* =========================================================
+   INFO PANEL
+   ========================================================= */
+
+.prep1-info-panel {
+  direction: rtl;
+
+  padding: 20px;
+
+  border-radius: 23px;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(20,42,93,.9),
+      rgba(8,20,52,.9)
+    );
+
+  border:
+    1px solid
+    rgba(104,165,255,.22);
+}
+
+.prep1-info-icon {
+  font-size: 3rem;
+}
+
+.prep1-info-panel h2 {
+  margin:
+    8px 0 12px;
+
+  color: white;
+
+  font-size: 1.2rem;
+}
+
+.prep1-info-panel p {
+  color: #bfd1eb;
+
+  font-size: .76rem;
+
+  line-height: 1.9;
+}
+
+.prep1-mini-progress {
+  margin-top: 16px;
+
+  padding: 12px;
+
+  border-radius: 13px;
+
+  background:
+    rgba(255,255,255,.05);
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prep1-mini-progress span {
+  color: #819fc3;
+
+  font-size: .7rem;
+}
+
+.prep1-mini-progress strong {
+  color: #74f08e;
+
+  font-size: .95rem;
+}
+
+/* =========================================================
+   AUTOMATIC HINT NOTE
+   ========================================================= */
+
+.prep1-auto-hint-note {
+  margin-top: 16px;
+
+  padding: 11px;
+
+  border-radius: 11px;
+
+  color: #ffe679;
+
+  background:
+    rgba(255,212,50,.08);
+
+  font-size: .65rem;
+
+  line-height: 1.7;
+}
+
+/* =========================================================
+   HELP BUTTON
+   ========================================================= */
+
+.prep1-help-btn {
+  width: 100%;
+
+  margin-top: 16px;
+
+  padding: 11px;
+
+  border-radius: 13px;
+
+  border:
+    1px solid
+    rgba(255,222,80,.42);
+
+  color: #ffe875;
+
+  background:
+    rgba(255,208,55,.11);
+
+  cursor: pointer;
+
+  font-weight: 900;
+}
+
+.prep1-help-btn:disabled {
+  opacity: .32;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   BOARD
+   ========================================================= */
+
+.prep1-board {
+  min-height: 370px;
+
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 23px;
+
+  background:
+    rgba(3,18,49,.72);
+
+  border:
+    1px solid
+    rgba(70,180,255,.23);
+}
+
+.prep1-board-label {
+  position: absolute;
+
+  left: 50%;
+  top: 14px;
+
+  transform:
+    translateX(-50%);
+
+  z-index: 5;
+
+  color: #78e7ff;
+
+  font-size: .75rem;
+
+  font-weight: 900;
+}
+
+/* =========================================================
+   MODEL CANVAS
+   ========================================================= */
+
+.prep1-model-canvas {
+  width: 760px;
+  height: 330px;
+
+  max-width: 100%;
+
+  position: relative;
+
+  margin:
+    28px auto 0;
+}
+
+/* =========================================================
+   CENTRAL RECTANGLE
+   ========================================================= */
+
+.prep1-area-rectangle {
+  width: 460px;
+  height: 235px;
+
+  position: absolute;
+
+  left: 50%;
+  top: 70px;
+
+  transform:
+    translateX(-50%);
+
+  border-radius: 18px;
+
+  border:
+    3px solid #7fdcff;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(21,97,137,.27),
+      rgba(42,64,125,.22)
+    );
+
+  box-shadow:
+    inset 0 0 35px
+      rgba(75,190,255,.08),
+    0 0 30px
+      rgba(60,160,255,.08);
+}
+
+/* =========================================================
+   GENERIC POSITION
+   ========================================================= */
+
+.prep1-position {
+  position: absolute;
+
+  z-index: 8;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+/* =========================================================
+   DIVIDEND
+   1395
+   داخل المستطيل - أعلى الشمال
+   ========================================================= */
+
+.prep1-position-dividend {
+  left: 34px;
+  top: 24px;
+}
+
+/* =========================================================
+   REMAINDER
+   0
+   داخل المستطيل - أسفل اليمين
+   ========================================================= */
+
+.prep1-position-remainder {
+  right: 30px;
+  bottom: 17px;
+}
+
+/* =========================================================
+   DIVISOR
+   5
+   خارج المستطيل ناحية اليسار
+   ========================================================= */
+
+.prep1-position-divisor {
+  left: 20px;
+  top: 165px;
+}
+
+/* =========================================================
+   QUOTIENT
+   279
+   فوق يمين المستطيل
+   ========================================================= */
+
+.prep1-position-quotient {
+  right: 18px;
+  top: 36px;
+}
+
+/* =========================================================
+   NUMBER BOX
+   ========================================================= */
+
+.prep1-number-box {
+  min-width: 68px;
+
+  padding:
+    10px 15px;
+
+  border-radius: 10px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      #54a5e8,
+      #2868af
+    );
+
+  border:
+    2px solid
+    rgba(167,220,255,.6);
+
+  box-shadow:
+    0 8px 20px
+      rgba(0,0,0,.25);
+
+  font-size: 1.2rem;
+
+  font-weight: 900;
+
+  transition:
+    .2s ease;
+}
+
+.prep1-number-highlight {
+  color: #073318;
+
+  background:
+    linear-gradient(
+      #91ffa2,
+      #48e86a
+    )
+    !important;
+
+  border-color:
+    #c6ffcb
+    !important;
+
+  box-shadow:
+    0 0 30px
+      rgba(72,255,111,.55)
+    !important;
+}
+
+/* =========================================================
+   DROP ZONES
+   ========================================================= */
+
+.prep1-drop-zone {
+  width: 145px;
+  height: 50px;
+
+  position: relative;
+
+  border-radius: 11px;
+
+  border:
+    2px dashed
+    rgba(85,177,255,.5);
+
+  background:
+    rgba(15,48,92,.72);
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  direction: rtl;
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease,
+    border-color .15s ease,
+    background .15s ease;
+}
+
+.prep1-zone-over {
+  transform:
+    scale(1.07);
+
+  border-color:
+    #71eaff;
+
+  background:
+    rgba(52,165,220,.18);
+
+  box-shadow:
+    0 0 27px
+      rgba(79,210,255,.4);
+}
+
+.prep1-zone-hinted {
+  border-color:
+    #ffe95c;
+}
+
+.prep1-zone-pulse {
+  animation:
+    prep1HintPulse
+    1s ease-in-out infinite;
+}
+
+@keyframes prep1HintPulse {
+
+  0%,
+  100% {
+    transform:
+      scale(1);
+
+    box-shadow:
+      0 0 6px
+      rgba(255,225,60,.15);
+  }
+
+  50% {
+    transform:
+      scale(1.045);
+
+    box-shadow:
+      0 0 27px
+      rgba(255,225,60,.55);
+  }
+}
+
+.prep1-zone-correct {
+  border-style:
+    solid;
+
+  border-color:
+    #5cff7b;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(64,231,103,.16),
+      rgba(34,130,62,.09)
+    );
+
+  box-shadow:
+    0 0 22px
+      rgba(74,255,108,.2);
+}
+
+.prep1-empty-text {
+  color: #6885a6;
+
+  font-size: .63rem;
+}
+
+.prep1-drop-value {
+  color: #8dffa1;
+
+  font-size: .83rem;
+
+  font-weight: 900;
+}
+
+.prep1-correct-check {
+  position: absolute;
+
+  right: 5px;
+  top: 5px;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  display: grid;
+
+  place-items: center;
+
+  background: #62ff82;
+
+  color: #0b3b1b;
+
+  font-size: .65rem;
+
+  font-weight: 900;
+}
+
+/* =========================================================
+   HINT ARROWS
+   ========================================================= */
+
+.prep1-hint-arrow {
+  position: absolute;
+
+  z-index: 20;
+
+  pointer-events: none;
+
+  color: #ffe933;
+
+  font-size: 3.3rem;
+
+  line-height: 1;
+
+  font-weight: 1000;
+
+  text-shadow:
+    0 0 8px
+      rgba(255,230,40,.8),
+    0 0 22px
+      rgba(255,200,20,.45);
+}
+
+/*
+  المقسوم:
+  داخل المستطيل من أعلى الشمال.
+*/
+
+.prep1-arrow-dividend {
+  left: -57px;
+  top: 24px;
+}
+
+/*
+  المقسوم عليه:
+  السهم خارج ناحية اليسار.
+*/
+
+.prep1-arrow-divisor {
+  left: -66px;
+  top: 20px;
+}
+
+/*
+  ناتج القسمة:
+  أعلى اليمين والسهم خارج ناحية اليمين.
+*/
+
+.prep1-arrow-quotient {
+  right: -66px;
+  top: 18px;
+}
+
+/*
+  الباقي:
+  السهم أسفل المستطيل.
+*/
+
+.prep1-arrow-remainder {
+  right: 46px;
+  bottom: -58px;
+}
+
+/* =========================================================
+   CARD BANK
+   ========================================================= */
+
+.prep1-card-bank {
+  width:
+    min(
+      850px,
+      95%
+    );
+
+  margin:
+    17px auto 0;
+
+  text-align: center;
+}
+
+.prep1-card-bank-title {
+  color: #7f9fc2;
+
+  font-size: .65rem;
+}
+
+.prep1-card-row {
+  min-height: 58px;
+
+  margin-top: 8px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+}
+
+/* =========================================================
+   DRAG CARD
+   ========================================================= */
+
+.prep1-label-card {
+  min-width: 145px;
+
+  padding:
+    14px 17px;
+
+  border-radius: 13px;
+
+  border:
+    1px solid
+    rgba(139,195,255,.5);
+
+  color: white;
+
+  background:
+    linear-gradient(
+      #4289cf,
+      #23568d
+    );
+
+  font-size: .86rem;
+
+  font-weight: 900;
+
+  cursor: grab;
+
+  touch-action: none;
+
+  user-select: none;
+
+  -webkit-user-select: none;
+
+  box-shadow:
+    0 10px 22px
+      rgba(0,0,0,.25);
+
+  transition:
+    opacity .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease;
+}
+
+.prep1-label-card:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 13px 27px
+      rgba(0,0,0,.3),
+    0 0 14px
+      rgba(74,174,255,.15);
+}
+
+.prep1-label-card:active {
+  cursor: grabbing;
+}
+
+.prep1-drag-source {
+  opacity: .18;
+}
+
+/* =========================================================
+   STRONG HINT - SAME COLOR
+   ========================================================= */
+
+.prep1-hint-match {
+  color:
+    #063416
+    !important;
+
+  background:
+    linear-gradient(
+      #94ffa4,
+      #47e96a
+    )
+    !important;
+
+  border-color:
+    #c6ffcb
+    !important;
+
+  box-shadow:
+    0 0 25px
+      rgba(72,255,111,.48)
+    !important;
+}
+
+/* =========================================================
+   DRAG OVERLAY
+   ========================================================= */
+
+.prep1-drag-overlay {
+  min-width: 150px;
+
+  padding:
+    15px 20px;
+
+  border-radius: 14px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      #59a5ea,
+      #245e9f
+    );
+
+  border:
+    2px solid
+    rgba(169,221,255,.8);
+
+  font-weight: 900;
+
+  pointer-events: none;
+
+  transform:
+    scale(1.1)
+    rotate(-2deg);
+
+  box-shadow:
+    0 20px 45px
+      rgba(0,0,0,.45),
+    0 0 30px
+      rgba(75,180,255,.36);
+}
+
+/* =========================================================
+   ALL PLACED
+   ========================================================= */
+
+.prep1-all-placed {
+  padding:
+    12px 25px;
+
+  border-radius: 13px;
+
+  color: #8effa1;
+
+  background:
+    rgba(65,232,100,.1);
+
+  border:
+    1px solid
+    rgba(80,255,120,.25);
+
+  font-weight: 900;
+}
+
+/* =========================================================
+   FEEDBACK
+   ========================================================= */
+
+.prep1-feedback {
+  width:
+    min(
+      800px,
+      94%
+    );
+
+  min-height: 42px;
+
+  margin:
+    13px auto 0;
+
+  padding:
+    10px 15px;
+
+  border-radius: 13px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  color: #ffe17b;
+
+  background:
+    rgba(255,212,60,.065);
+
+  font-size: .75rem;
+
+  font-weight: 900;
+}
+
+.prep1-feedback.success {
+  color: #8dffa5;
+
+  background:
+    rgba(69,235,100,.09);
+
+  border:
+    1px solid
+    rgba(80,255,120,.16);
+}
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.prep1-progress {
+  width:
+    min(
+      620px,
+      85%
+    );
+
+  margin:
+    10px auto 0;
+
+  display: grid;
+
+  grid-template-columns:
+    auto 1fr auto;
+
+  gap: 10px;
+
+  align-items: center;
+
+  color: #829fc1;
+
+  font-size: .65rem;
+}
+
+.prep1-progress strong {
+  color: #7eff98;
+}
+
+.prep1-progress-track {
+  height: 7px;
+
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background:
+    rgba(255,255,255,.07);
+}
+
+.prep1-progress-track div {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #47e76a,
+      #67eaff
+    );
+
+  box-shadow:
+    0 0 11px
+      rgba(77,230,130,.35);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.prep1-footer {
+  height: 72px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding:
+    0 20px;
+}
+
+.prep1-reset,
+.prep1-next {
+  min-width: 160px;
+
+  padding:
+    12px 17px;
+
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  font-weight: 900;
+}
+
+.prep1-reset {
+  color: #cbdcf4;
+
+  background: #162948;
+
+  border:
+    1px solid
+    rgba(128,177,255,.27);
+}
+
+.prep1-next {
+  color: #063718;
+
+  background:
+    linear-gradient(
+      #a2ff8d,
+      #45eb61
+    );
+
+  border:
+    2px solid
+    rgba(190,255,183,.7);
+}
+
+.prep1-footer-lights {
+  display: flex;
+
+  gap: 7px;
+}
+
+.prep1-footer-lights span {
+  width: 26px;
+  height: 13px;
+
+  border-radius: 5px;
+
+  background: #58e7ff;
+}
+
+.prep1-footer-lights span:nth-child(2) {
+  background: #ffe34f;
+}
+
+.prep1-footer-lights span:nth-child(3) {
+  background: #ff5769;
+}
+
+.prep1-footer-lights span:nth-child(4) {
+  background: #5aff79;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+  .prep1-game {
+    grid-template-columns:
+      1fr;
+  }
+
+  .prep1-info-panel {
+    order: 2;
+  }
+
+  .prep1-main {
+    overflow-y: auto;
+  }
+
+}
+
+@media (max-width: 760px) {
+
+  .prep1-page {
+    padding: 5px;
+  }
+
+  .prep1-console {
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding: 10px;
+
+    border-radius: 20px;
+  }
+
+  .prep1-header-title span {
+    display: none;
+  }
+
+  .prep1-title h1 {
+    font-size: 1.45rem;
+  }
+
+  .prep1-board {
+    min-height: 500px;
+
+    overflow-x: auto;
+  }
+
+  .prep1-model-canvas {
+    min-width: 700px;
+  }
+
+  .prep1-card-row {
+    gap: 8px;
+  }
+
+  .prep1-label-card {
+    min-width: 125px;
+
+    padding:
+      12px 14px;
+  }
+
+  .prep1-footer-lights {
+    display: none;
+  }
+
+}
+
+/* =========================================================
+   STAGE 1 - CARD BASED HINT SYSTEM
+   ========================================================= */
+
+.prep1-drag-card-wrapper {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+/*
+  بعد غلطتين البطاقة نفسها فقط
+  يتغير شكل Border الخاص بها تغيير بسيط
+  بدون إعطاء الإجابة.
+*/
+
+.prep1-label-card-hinted {
+  border-color:
+    rgba(255,225,74,.75);
+
+  box-shadow:
+    0 0 16px
+    rgba(255,215,50,.15);
+}
+
+/* =========================================================
+   MINI HINT DRAWING
+   ========================================================= */
+
+.prep1-card-hint {
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+}
+
+.prep1-card-hint-rectangle {
+  width: 76px;
+  height: 43px;
+
+  position: relative;
+
+  border-radius: 5px;
+
+  border:
+    2px solid
+    #87cfff;
+
+  background:
+    rgba(59,133,194,.18);
+
+  box-shadow:
+    0 0 10px
+    rgba(81,187,255,.12);
+}
+
+/* =========================================================
+   CARD HINT ARROWS
+   ========================================================= */
+
+.prep1-card-arrow {
+  position: absolute;
+
+  z-index: 5;
+
+  color:
+    #ffec39;
+
+  font-size:
+    2.15rem;
+
+  line-height:
+    1;
+
+  font-weight:
+    1000;
+
+  text-shadow:
+    0 0 8px
+    rgba(255,230,40,.75);
+}
+
+/*
+  المقسوم
+
+  مستطيل
+  والسهم داخل المستطيل
+  من أعلى الشمال للداخل.
+*/
+
+.prep1-card-arrow-dividend {
+  left: -18px;
+  top: -24px;
+  font-size: 2.4rem;
+}
+
+/*
+  المقسوم عليه
+
+  مستطيل
+  والسهم يخرج من يساره للخارج.
+*/
+
+.prep1-card-arrow-divisor {
+  left: -28px;
+  top: 7px;
+}
+
+/*
+  ناتج القسمة
+
+  مستطيل
+  السهم أعلى يمينه
+  ويشير للخارج.
+*/
+
+.prep1-card-arrow-quotient {
+  right: -28px;
+  top: -8px;
+}
+
+/*
+  الباقي
+
+  مستطيل
+  والسهم تحته متجه لأسفل.
+*/
+
+.prep1-card-arrow-remainder {
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  bottom: -29px;
+}
+
+/* =========================================================
+   DRAG OVERLAY + HINT
+   ========================================================= */
+
+.prep1-overlay-wrapper {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  pointer-events: none;
+}
+
+.prep1-drag-overlay {
+  min-width: 150px;
+
+  padding:
+    15px 20px;
+
+  border-radius: 14px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      #59a5ea,
+      #245e9f
+    );
+
+  border:
+    2px solid
+    rgba(169,221,255,.8);
+
+  font-weight: 900;
+
+  pointer-events: none;
+
+  transform:
+    scale(1.08)
+    rotate(-2deg);
+
+  box-shadow:
+    0 20px 45px
+    rgba(0,0,0,.45),
+    0 0 30px
+    rgba(75,180,255,.3);
+}
+
+/* =========================================================
+   DROP ZONE
+   No hint is shown here.
+   ========================================================= */
+
+.prep1-drop-zone {
+  width: 145px;
+  height: 50px;
+
+  position: relative;
+
+  border-radius: 11px;
+
+  border:
+    2px dashed
+    rgba(85,177,255,.5);
+
+  background:
+    rgba(15,48,92,.72);
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  direction: rtl;
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease,
+    border-color .15s ease,
+    background .15s ease;
+}
+
+/*
+  ده مجرد Hover طبيعي أثناء السحب.
+  مش Hint.
+*/
+
+.prep1-zone-over {
+  transform:
+    scale(1.04);
+
+  border-color:
+    #71eaff;
+
+  background:
+    rgba(52,165,220,.15);
+
+  box-shadow:
+    0 0 20px
+    rgba(79,210,255,.25);
+}
+
+/*
+  بعد الإجابة الصح فقط.
+*/
+
+.prep1-zone-correct {
+  border-style:
+    solid;
+
+  border-color:
+    #5cff7b;
+
+  background:
+    rgba(64,231,103,.13);
+
+  box-shadow:
+    0 0 18px
+    rgba(74,255,108,.16);
+}
+
+/* =========================================================
+   CORRECT CARD STAYS ABOVE
+   ========================================================= */
+
+.prep1-drop-value {
+  color:
+    #8dffa1;
+
+  font-size:
+    .83rem;
+
+  font-weight:
+    900;
+}
+
+.prep1-correct-check {
+  position: absolute;
+
+  right: 5px;
+  top: 5px;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  display: grid;
+
+  place-items: center;
+
+  background:
+    #62ff82;
+
+  color:
+    #0b3b1b;
+
+  font-size:
+    .65rem;
+
+  font-weight:
+    900;
+}
